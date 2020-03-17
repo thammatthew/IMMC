@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584323192629.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3819669284",
+    "id" : "8BBA055A",
+    "lastKnownWriteTime" : 1584439241,
+    "last_content_update" : 1584439241882,
+    "path" : "~/Desktop/IMMC/IMMC/storedata.R",
+    "project_path" : "storedata.R",
+    "properties" : {
+        "cursorPosition" : "22,38",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

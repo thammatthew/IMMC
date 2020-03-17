@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584438949941.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3177453558",
+    "id" : "7087CCA6",
+    "lastKnownWriteTime" : 1584439231,
+    "last_content_update" : 1584439231218,
+    "path" : "~/Desktop/IMMC/IMMC/simulate.R",
+    "project_path" : "simulate.R",
+    "properties" : {
+        "cursorPosition" : "42,2",
+        "scrollLine" : "15",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584431035476.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "AD9F96F2",
+    "lastKnownWriteTime" : 3,
+    "last_content_update" : 1584431035476,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "id" : "d3e13c7d45f645b98db93495737e90e2",
+        "name" : "agent_list",
+        "title" : "agent_list"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "object_explorer"
+}
