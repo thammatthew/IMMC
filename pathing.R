@@ -7,7 +7,7 @@ library(gifski)
 library(pixmap)
 library(reshape2)
 source("astar.R")
-source("examples.R")
+source("searchmaze.R")
 source("storedata.R")
 
 # Instantiate search environment from a bitmap (cheap way of dealing with a matrix)
