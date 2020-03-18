@@ -72,6 +72,11 @@ read_img_map <- function(img_path) {
   #0000ff = Exits (final target for all agents)
   exit_mat <- img@blue - walls_mat - cashier_mat
   
+  #500000 = Cashier in
+  
+  #250000 = Cashier out
+  
+  
   #00xx00 = Target objects (for now, the first target for all agents)
   # @Keane: Encode target objects by converting their numerical item_id to hex, then setting that to be the colour of the green channel
   # convert back to 0-255 encoding
