@@ -4,9 +4,9 @@ library(reshape2)
 library(pixmap)
 library(ggplot2)
 library(plotly)
-source("astar.R")
-source("searchmaze.R")
-source("storedata.R")
+source("astar.R", local=TRUE)
+source("searchmaze.R", local=TRUE)
+source("storedata.R", local=TRUE)
 
 reverse_encode <- function(store_layout, img_w=48, img_h=48) {
   walls_mat <- store_layout$walls_mat
