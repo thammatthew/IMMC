@@ -180,10 +180,13 @@ norm_loss <- function(loss, get_loss, worst_case) {
   return(loss/loss_max)
 }
 
-simulate <- function(pbm_path, storedata, n_agents=100, loss_fn=get_loss, max_routes=3, coeff=0.1, reps=5, plot=FALSE, name="density_plot") {
+simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, loss_fn=get_loss, max_routes=3, coeff=0.1, reps=5, plot=FALSE, name="density_plot", from_bitmap=TRUE) {
   # This value is technically not necessarily the same for all agents, but we're assuming it is
-
-  store_layout <- read_img_map(pbm_path)
+  if(from_bitmap == TRUE) {
+    store_layout <- read_img_map(pbm_path)
+  } else {
+    store_layout = store_layout
+  }
   img_w = dim(store_layout$walls_mat)[1]
   img_h = dim(store_layout$walls_mat)[2]
 
