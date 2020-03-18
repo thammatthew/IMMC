@@ -3,6 +3,7 @@ library(grid)
 library(reshape2)
 library(pixmap)
 library(ggplot2)
+library(plotly)
 source("astar.R")
 source("searchmaze.R")
 source("storedata.R")
@@ -28,7 +29,7 @@ reverse_encode <- function(store_layout, img_w=48, img_h=48) {
 
 plot_mat <- function(mat) {
   df = make_df_full(mat)
-  ggplot(df, aes(x=x,y=y,fill=value)) +
+  p<-ggplot(df, aes(x=x,y=y,fill=value)) +
     geom_tile() +
     scale_y_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
     scale_x_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
@@ -38,6 +39,23 @@ plot_mat <- function(mat) {
     theme(axis.title = element_blank(),
           axis.text = element_blank(),
           legend.position = "none")
+  p<-ggplotly(p)
+  return(p)
+}
+
+plot_df <- function(df) {
+  p<-ggplot(df, aes(x=x,y=y,fill=value)) +
+    geom_tile() +
+    scale_y_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+    scale_x_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+    coord_equal() +
+    scale_fill_viridis_c() +
+    theme_minimal() +
+    theme(axis.title = element_blank(),
+          axis.text = element_blank(),
+          legend.position = "none")
+  p<-ggplotly(p)
+  return(p)
 }
 
 make_df <- function(mat, val) {
@@ -49,6 +67,17 @@ make_df <- function(mat, val) {
 
 make_df_full <- function(mat) {
   df <- setNames(melt(mat), c('y', 'x', 'value'))
+}
+
+make_mat <- function(df, val_col, img_w=48, img_h=48) {
+  mat <- matrix(0, img_w, img_h)
+  for(i in 1:nrow(df)) {
+    row = df[i,]
+    coord = as.numeric(row[1:2])
+    value = row[[val_col]]
+    mat[coord[1], coord[2]] <- value
+  }
+  return(mat)
 }
 
 read_img_map <- function(img_path) {
@@ -155,8 +184,29 @@ simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, na
         ggsave(plot=p, filename=file_name, width=1, height=1, units="in", dpi=150, device="png")
       }
     }
+    print(paste("Agent",i,"simulated..."))
   }
   return(density_mat)
+}
+
+get_monetary_loss <- function(row, item_df, total_ghi, n_agents) {
+  coord = row[1:2]
+  density = row[3]
+  if(density == 0) {return}
+  adj<-c()
+  for(i in 1:-1)
+    for(j in 1:-1)
+      if(i!=0 || j !=0)
+        adj<-rbind(adj,coord+c(i,j)) 
+  value_lost<-0
+  for(i in 1:nrow(adj)) {
+    if(adj[i,][1]==0 | adj[i,][2]==0 | adj[i,][1]>48 | adj[i,][2]>48) {next}
+    if(item_df[which(item_df$y==adj[i,1] & item_df$x==adj[i,2]),3]==0) {next} else {
+      item <- item_df[which(item_df$y==adj[i,1] & item_df$x==adj[i,2]),3:7]
+    }
+    value_lost = value_lost + (density^2/100000) * item$discounted_price * item$frag * (item$qty + (item$qty - (n_agents * (item$ghi / total_ghi))))/2
+  }
+  return(value_lost)
 }
 
 # Some loss functions
@@ -182,6 +232,7 @@ norm_loss <- function(loss, get_loss, worst_case) {
 
 simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, loss_fn=get_loss, max_routes=3, coeff=0.1, reps=5, plot=FALSE, name="density_plot", from_bitmap=TRUE) {
   # This value is technically not necessarily the same for all agents, but we're assuming it is
+  print("Reading store layout from bitmap...")
   if(from_bitmap == TRUE) {
     store_layout <- read_img_map(pbm_path)
   } else {
@@ -189,15 +240,36 @@ simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, los
   }
   img_w = dim(store_layout$walls_mat)[1]
   img_h = dim(store_layout$walls_mat)[2]
-
+  print("Store layout loaded.")
+  
+  print("Randomly generating agents...")
   agent_list <- create_agent_list(store_layout, n_agents)
+  print("Running density simulation...")
   density_mat <- simulate_density(store_layout, agent_list, coeff, plot, name, img_w, img_h)
   density_df = make_df_full(density_mat)
+  print("Density simulation complete.")
   
-  worst_case = rep(n_agents*max_routes, img_w*img_h/2)
+  print("Computing estimated loss...")
+  item_mat <- make_mat(store_layout$target_df, "value")
+  item_df <- make_df_full(item_mat)
+  item_df <- item_df[order(-item_df$value),]
   
-  loss <- norm_loss(loss_fn(density_df$value), loss_fn, worst_case)
+  item_df$frag <- c(rev(storedata$frag), rep(0, nrow(item_df)-length(storedata$frag)))
+  item_df$ghi <- c(rev(storedata$ghi), rep(0, nrow(item_df)-length(storedata$ghi)))
+  item_df$discounted_price <- c(rev(storedata$discounted_price), rep(0, nrow(item_df)-length(storedata$discounted_price)))
+  item_df$qty <- c(rev(storedata$qty), rep(0, nrow(item_df)-length(storedata$qty)))
   
-  output = list(density_mat, loss)
+  total_ghi = sum(storedata$ghi)
+  
+  loss_mat <- matrix(0, nrow=48, ncol=48)
+  loss_mat[] <- apply(density_df,1,get_monetary_loss, item_df=item_df, total_ghi=total_ghi, n_agents=n_agents)
+  
+  loss_df <- make_df_full(loss_mat)
+  
+  loss <- loss_fn(loss_df$value)
+  
+  print("Simulation completed successfully.")
+
+  output = list(density_mat, loss_mat, loss)
   return(output)
 }
