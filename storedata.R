@@ -13,6 +13,7 @@ temp <- storedata[c("price", "discounted_price", "qty", "rating")]
 temp <- lapply(temp, as.numeric)
 temp <- as.data.frame(temp)
 storedata[c("price", "discounted_price", "qty", "rating")] <- temp
+rm(temp)
 
 storedata$discount_amount <- storedata$price - storedata$discounted_price
 storedata$discount_percentage <- storedata$discount_amount / storedata$price

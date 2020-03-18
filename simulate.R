@@ -185,10 +185,8 @@ simulate <- function(pbm_path, storedata, n_agents=100, loss_fn=get_loss, max_ro
 
   store_layout <- read_img_map(pbm_path)
   img_w = dim(store_layout$walls_mat)[1]
-  print(img_w)
   img_h = dim(store_layout$walls_mat)[2]
-  print(img_h)
-  
+
   agent_list <- create_agent_list(store_layout, n_agents)
   density_mat <- simulate_density(store_layout, agent_list, coeff, plot, name, img_w, img_h)
   density_df = make_df_full(density_mat)
