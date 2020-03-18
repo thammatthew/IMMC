@@ -17,7 +17,7 @@ storedata[c("price", "discounted_price", "qty", "rating")] <- temp
 storedata$discount_amount <- storedata$price - storedata$discounted_price
 storedata$discount_percentage <- storedata$discount_amount / storedata$price
 
-storedata$happiness <- storedata$discount_amount * storedata$discount_percentage * storedata$rating / storedata$qty
+storedata$ghi <- storedata$discount_amount * storedata$discount_percentage * storedata$rating / storedata$qty
 
 # Assign a unique item_id at this point to maintain consistency throughout code
 storedata$item_id <- 1:nrow(storedata)

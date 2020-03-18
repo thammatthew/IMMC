@@ -3,8 +3,8 @@ library(grid)
 library(reshape2)
 library(pixmap)
 library(ggplot2)
-source("/Users/matthewtham/Desktop/IMMC/IMMC/astar.R")
-source("/Users/matthewtham/Desktop/IMMC/IMMC/examples.R")
+source("astar.R")
+source("examples.R")
 
 make_df <- function(mat, val) {
   df <- which(mat == val, arr.ind = TRUE) %>%
