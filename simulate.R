@@ -90,7 +90,7 @@ read_img_map <- function(img_path, targets_encoded=FALSE) {
   walls_mat[which(walls_mat != 3)] <- 0
   walls_mat <- walls_mat/3
   
-  #330033 = Blocked walls (walls where items cannot be placed)
+  #cc00cc = Blocked walls (walls where items cannot be placed)
   blocked_mat <- img@red + img@blue + img@green
   blocked_mat[which(blocked_mat!=1.6)]<-0
   blocked_mat <- blocked_mat / 1.6
