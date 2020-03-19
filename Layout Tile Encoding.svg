@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="102px" height="48px" viewBox="0 0 102 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Artboard</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <image id="original_layout_blocked" x="0" y="0" width="48" height="48" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAMKADAAQAAAABAAAAMAAAAADbN2wMAAABvElEQVRYCe1YW5LCMAxLGW5E78SZuFM5UzGjonEepCbJbv3RfoDsOLZqOdkdpvB51nX9wPL3NE1cMAYbw3TaC40TFDogHb3sdrWwb5xLquNhSneSXUFNaJKjDG/d1Fsw6Yi3Y9bKQW+HNPVfcc5GPO2E9C3wKy5SgbOdkOy3a5RrivKSAQ8pbjMkXrpYiZ5klf5+QJVZ4j2/YnABbOpmPw9mYCEQEnPrECPsgLmwhRl1hopTh2ncNUM60SjsjlBIOj/qRY15pDoexAvuvalZuDIuUoZhAhCpPRq7k8wdofZjX+y83all0vjgm1pTAfYqGQ6CNNwC8Co8O5CJZv7SSUBRVu7y2iEStIPkRRMzz1MMyJ3tp4waISnNb1QYoEnkzlOyvIGx52DJYjJv65Qs70ns+RPJ5Bzx+Ei53Iw5RJY7ydwR8vovbCTjPxr61kbZ9qEeQpuzT2buZmjr0BKWhje+hznZ9QjLnDmTmLp5Za86E9XL2FfdSeaOUOGUtc2TXZR6ZIFQ3zDd6vV2V91JFhPCrwIdn0t47PagHrD9tDhwbvoUr7M9YnUa2Bvwn0M010t4wn+Lb/Dnl78NL7xrASH9YMb6AAAAAElFTkSuQmCC"></image>
+        <text id="Layout-Tile-Encoding" font-family="HelveticaNeue-Medium, Helvetica Neue" font-size="4" font-weight="400" fill="#000000">
+            <tspan x="51" y="5">Layout Tile Encoding</tspan>
+        </text>
+        <text id="Traversable-Space-Sh" font-family="HelveticaNeue-Light, Helvetica Neue" font-size="4" font-weight="300" fill="#000000">
+            <tspan x="51" y="11">Traversable Space </tspan>
+            <tspan x="51" y="16">Shelves (w/ items)</tspan>
+            <tspan x="51" y="21">Walls (w/o items)</tspan>
+            <tspan x="51" y="26">Cashiers</tspan>
+            <tspan x="51" y="31">Cashier entrance</tspan>
+            <tspan x="51" y="36">Cashier exit</tspan>
+            <tspan x="51" y="41">Entrance</tspan>
+            <tspan x="51" y="46">Exit</tspan>
+        </text>
+        <rect id="Rectangle" fill="#000000" x="84" y="13" width="15" height="4"></rect>
+        <text id="#000000-#FFFFFF-#CC0" font-family="LMMono10-Regular, Latin Modern Mono" font-size="4" font-weight="normal">
+            <tspan x="84" y="11" fill="#000000">#000000</tspan>
+            <tspan x="84" y="16" fill="#FFFFFF">#FFFFFF</tspan>
+            <tspan x="98.7" y="16" fill="#000000"></tspan>
+            <tspan x="84" y="21" fill="#DE00D3">#CC00CC</tspan>
+            <tspan x="98.7" y="21" fill="#000000"></tspan>
+            <tspan x="84" y="26" fill="#00FFFF">#00FFFF</tspan>
+            <tspan x="84" y="31" fill="#380000">#330000</tspan>
+            <tspan x="84" y="36" fill="#020036">#000033</tspan>
+            <tspan x="84" y="41" fill="#FF0000">#FF0000</tspan>
+            <tspan x="84" y="46" fill="#2600FF">#0000FF</tspan>
+        </text>
+    </g>
+</svg>
