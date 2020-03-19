@@ -217,21 +217,30 @@ simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, na
 get_monetary_loss <- function(row, item_df, total_ghi, n_agents) {
   coord = row[1:2]
   density = row[3]
-  if(density == 0) {return}
+  value_lost<-0
+  if(density == 0) {return(value_lost)}
   adj<-c()
   for(i in 1:-1)
     for(j in 1:-1)
       if(i!=0 || j !=0)
         adj<-rbind(adj,coord+c(i,j)) 
-  value_lost<-0
   for(i in 1:nrow(adj)) {
-    if(adj[i,][1]==0 | adj[i,][2]==0 | adj[i,][1]>48 | adj[i,][2]>48) {next}
+    if(adj[i,1]==0 | adj[i,2]==0 | adj[i,1]>48 | adj[i,2]>48) {next}
     if(item_df[which(item_df$y==adj[i,1] & item_df$x==adj[i,2]),3]==0) {next} else {
       item <- item_df[which(item_df$y==adj[i,1] & item_df$x==adj[i,2]),3:7]
     }
-    value_lost = value_lost + (density^2/100000) * item$discounted_price * item$frag * (item$qty + (item$qty - (n_agents * (item$ghi / total_ghi))))/2
+    e_sold = n_agents * (item$ghi / total_ghi)
+    e_left = item$qty - e_sold
+    if (e_left >= 0) {
+      avg_remaining = (item$qty + e_left)/2
+      integrated_qty = 1/2 * (item$qty-e_left) + e_left
+    } else {
+      time_sold_out = item$qty/e_sold
+      integrated_qty = 1/2 * item$qty * time_sold_out
+    }
+    value_lost = value_lost + (density^2/100000) * item$discounted_price * item$frag * integrated_qty
   }
-  return(value_lost)
+  return(as.numeric(value_lost))
 }
 
 # Some loss functions
@@ -255,6 +264,25 @@ norm_loss <- function(loss, get_loss, worst_case) {
   return(loss/loss_max)
 }
 
+get_loss_mat <- function(storedata, density_mat, target_df, n_agents) {
+  density_df <- make_df_full(density_mat)
+  
+  item_mat <- make_mat(target_df, "value")
+  item_df <- make_df_full(item_mat)
+  item_df <- item_df[order(-item_df$value),]
+  
+  item_df$frag <- c(rev(storedata$frag), rep(0, nrow(item_df)-length(storedata$frag)))
+  item_df$ghi <- c(rev(storedata$ghi), rep(0, nrow(item_df)-length(storedata$ghi)))
+  item_df$discounted_price <- c(rev(storedata$discounted_price), rep(0, nrow(item_df)-length(storedata$discounted_price)))
+  item_df$qty <- c(rev(storedata$qty), rep(0, nrow(item_df)-length(storedata$qty)))
+  
+  total_ghi = sum(storedata$ghi)
+  
+  loss_mat <- matrix(0, nrow=48, ncol=48)
+  loss_mat[] <- apply(density_df,1,get_monetary_loss, item_df=item_df, total_ghi=total_ghi, n_agents=n_agents)
+  return(loss_mat)
+}
+
 simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, loss_fn=get_loss, max_routes=3, coeff=0.1, reps=5, plot=FALSE, name="density_plot", from_bitmap=TRUE) {
   # This value is technically not necessarily the same for all agents, but we're assuming it is
   print("Reading store layout from bitmap...")
@@ -271,23 +299,11 @@ simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, los
   agent_list <- create_agent_list(store_layout, n_agents)
   print("Running density simulation...")
   density_mat <- simulate_density(store_layout, agent_list, coeff, plot, name, img_w, img_h)
-  density_df = make_df_full(density_mat)
   print("Density simulation complete.")
   
   print("Computing estimated loss...")
-  item_mat <- make_mat(store_layout$target_df, "value")
-  item_df <- make_df_full(item_mat)
-  item_df <- item_df[order(-item_df$value),]
   
-  item_df$frag <- c(rev(storedata$frag), rep(0, nrow(item_df)-length(storedata$frag)))
-  item_df$ghi <- c(rev(storedata$ghi), rep(0, nrow(item_df)-length(storedata$ghi)))
-  item_df$discounted_price <- c(rev(storedata$discounted_price), rep(0, nrow(item_df)-length(storedata$discounted_price)))
-  item_df$qty <- c(rev(storedata$qty), rep(0, nrow(item_df)-length(storedata$qty)))
-  
-  total_ghi = sum(storedata$ghi)
-  
-  loss_mat <- matrix(0, nrow=48, ncol=48)
-  loss_mat[] <- apply(density_df,1,get_monetary_loss, item_df=item_df, total_ghi=total_ghi, n_agents=n_agents)
+  loss_mat <- get_loss_mat(storedata, density_mat, store_layout$target_df, n_agents)
   
   loss_df <- make_df_full(loss_mat)
   
