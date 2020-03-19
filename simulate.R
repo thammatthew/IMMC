@@ -80,7 +80,7 @@ make_mat <- function(df, val_col, img_w=48, img_h=48) {
   return(mat)
 }
 
-read_img_map <- function(img_path) {
+read_img_map <- function(img_path, targets_encoded=FALSE) {
   img <- read.pnm(img_path)
 
   #ffffff = Walls (all non-traversable tiles, including shelves and walls)
@@ -90,34 +90,54 @@ read_img_map <- function(img_path) {
   walls_mat[which(walls_mat != 3)] <- 0
   walls_mat <- walls_mat/3
   
+  #330033 = Blocked walls (walls where items cannot be placed)
+  blocked_mat <- img@red + img@blue + img@green
+  blocked_mat[which(blocked_mat!=1.6)]<-0
+  blocked_mat <- blocked_mat / 1.6
+  
+  walls_mat <- blocked_mat+walls_mat
+  
   #00ffff = Cashiers (for now, the second target for all agents)
   cashier_mat <- img@green + img@blue + img@red
   cashier_mat[which(cashier_mat != 2)] <- 0
   cashier_mat <- cashier_mat/2
   
+  #330000 = Cashier inlet (for supporting queueing behaviour)
+  cashier_in_mat <- img@red
+  cashier_in_mat[which(cashier_in_mat!=0.2)] <- 0
+  cashier_in_mat <- cashier_in_mat * 5
+  
+  #000033 = Cashier outlet (for supporting queueing behaviour)
+  cashier_out_mat <- img@blue
+  cashier_out_mat[which(cashier_out_mat!=0.2)] <- 0
+  cashier_out_mat <- cashier_out_mat * 5
+  
   #ff0000 = Entrances (possible source points)
-  entrance_mat <- img@red - walls_mat
+  entrance_mat <- img@red
+  entrance_mat[which(entrance_mat!=1)] <- 0
+  entrance_mat = entrance_mat - walls_mat + blocked_mat
   
   #0000ff = Exits (final target for all agents)
-  exit_mat <- img@blue - walls_mat - cashier_mat
-  
-  #500000 = Cashier in
-  
-  #250000 = Cashier out
-  
+  exit_mat <- img@blue
+  exit_mat[which(exit_mat!=1)] <- 0
+  exit_mat = exit_mat - walls_mat - cashier_mat + blocked_mat
   
   #00xx00 = Target objects (for now, the first target for all agents)
   # @Keane: Encode target objects by converting their numerical item_id to hex, then setting that to be the colour of the green channel
   # convert back to 0-255 encoding
-  target_mat <- img@green*255
-  target_mat[which(target_mat == 255)] <- 0
-  target_df <- make_df_full(target_mat)
-  target_df <- target_df[which(target_df$value != 0),]
-  target_df$value = 255 - target_df$value
-  target_df <- target_df[order(target_df$value),]
-  target_df$ghi <- storedata$ghi
+  if(targets_encoded == TRUE) {
+    target_mat <- img@green*255
+    target_mat[which(target_mat == 255)] <- 0
+    target_df <- make_df_full(target_mat)
+    target_df <- target_df[which(target_df$value != 0),]
+    target_df$value = 255 - target_df$value
+    target_df <- target_df[order(target_df$value),]
+    target_df$ghi <- storedata$ghi
+  } else {
+    target_df <- NULL
+  }
   
-  store_layout <- list("walls_mat" = walls_mat, "cashier_mat" = cashier_mat, "entrance_mat" = entrance_mat, "exit_mat" = exit_mat, "target_df" = target_df)
+  store_layout <- list("walls_mat" = walls_mat, "blocked_mat" = blocked_mat, "cashier_mat" = cashier_mat, "cashier_in_mat" = cashier_in_mat, "cashier_out_mat" = cashier_out_mat, "entrance_mat" = entrance_mat, "exit_mat" = exit_mat, "target_df" = target_df)
   
   return(store_layout)
 }
@@ -150,6 +170,11 @@ create_agent_list <- function(store_layout, n_agents) {
 simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, name="density_plot", img_w=48, img_h=48) {
   density_mat = matrix(0, img_w, img_h)
   walls_mat = store_layout[["walls_mat"]]
+  cashier_in_mat = store_layout[["cashier_in_mat"]]
+  cashier_out_mat = store_layout[["cashier_out_mat"]]
+  
+  walls_cashier_in = walls_mat + cashier_out_mat
+  walls_cashier_out = walls_mat + cashier_in_mat
   
   for(i in 1:length(agent_list)) {
     current_agent <- agent_list[[i]]
@@ -158,7 +183,7 @@ simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, na
     for(j in 1:n_routes) {
       source = current_agent[[j]]
       target = current_agent[[j+1]]
-      mg <- SearchMaze2D$new(walls_mat, density_mat, coeff)
+      if(j == 2) {mg <- SearchMaze2D$new(walls_cashier_in, density_mat, coeff)} else if(j == 3) {mg <- SearchMaze2D$new(walls_cashier_out, density_mat, coeff)} else {mg <- SearchMaze2D$new(walls_mat, density_mat, coeff)}
       current_path <- mg$run(source, target)
       if (is.null(current_path)) {
         current_path <- mg$run(target, source)

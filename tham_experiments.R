@@ -4,16 +4,17 @@ source("shelfer.R", local=TRUE)
 n_reps = 5
 
 # Pull a store_layout from an image
-store_layout <- read_img_map("example.pbm")
+store_layout <- read_img_map("store_layout/bitmap/original_layout_blocked.pbm")
 
 # Baseline: completely randomised arrangement of items
 # Place items into the layout
 store_layout_random <- place_items(store_layout, storedata, select_positions_random, order_positions_ascending_y, order_items_random)
+
 # Create a blank list to store results
 results = list()
 # Run simulation for 5 reps
 for(i in 1:n_reps) {
-  results[[i]] <- results_descending[[i]] <- simulate(store_layout = store_layout_descending, storedata=storedata, n_agents = 100, plot=FALSE, from_bitmap = FALSE)
+  results[[i]] <- simulate(store_layout = store_layout_descending, storedata=storedata, n_agents = 100, plot=FALSE, from_bitmap = FALSE)
 }
 # Save those results in an .rds file for later use
 saveRDS(results, "default.rds")

@@ -3,9 +3,10 @@ store_layout <- read_img_map("example.pbm")
 
 # Core place_items function; no need to edit this code
 place_items <- function(store_layout, storedata, select_positions, order_positions, order_items) {
-  shelf_mat <- store_layout_ascending$walls_mat
+  walls_mat <- store_layout$walls_mat
+  blocked_mat <- store_layout$blocked_mat
+  shelf_mat <- walls_mat-blocked_mat
   # Zero out the entrance wall
-  shelf_mat[nrow(shelf_mat),] <- 0
   # Convert the available spots into df format for sampling
   shelf_df <- make_df(shelf_mat, 1)
   # Select 134 shelf positions from possible positions
