@@ -314,3 +314,76 @@ simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, los
   output = list(density_mat, loss_mat, loss)
   return(output)
 }
+
+plot_output <- function(output, filename) {
+  results <- output[[2]]
+  store_layout <- output[[1]]
+  density_mat_avg <- matrix(0, 48, 48)
+  loss_mat_avg <- matrix(0,48,48)
+  loss_avg <- 0
+  for(i in 1:length(results)) {
+    density_mat_avg <- density_mat_avg + results[[i]][[1]]
+    loss_mat_avg <- loss_mat_avg + results[[i]][[2]]
+    loss_avg <- loss_avg + results[[i]][[3]] 
+  }
+  density_mat_avg <- density_mat_avg/length(results)
+  loss_mat_avg <- loss_mat_avg/length(results)
+  loss_avg <- loss_avg/length(results)
+  
+  density_df_avg <- make_df_full(density_mat_avg)
+  loss_df_avg <- make_df_full(loss_mat_avg)
+  
+  walls_df <- make_df(store_layout$walls_mat, 1)
+  entrance_df <- make_df(store_layout$entrance_mat, 1)
+  exit_df <- make_df(store_layout$exit_mat, 1)
+  target_df <- store_layout$target_df
+  
+  p1<-ggplot(walls_df, aes(x=x, y=y)) +
+    geom_rect(xmin=0.5,xmax=48.5,ymin=0.5,ymax=48.5, fill="#000000") +
+    geom_tile(data=walls_df, fill="#FFFFFF") +
+    geom_tile(data=entrance_df, fill="#FF0000") +
+    geom_tile(data=exit_df, fill="#0000FF") +
+    geom_tile(data=target_df, aes(fill=ghi)) +
+    scale_y_continuous(breaks = seq(0, 48, 4), limits = c(0, 48.5), minor_breaks = NULL) +
+    scale_x_continuous(breaks = seq(0, 48, 4), limits = c(0, 48.5), minor_breaks = NULL) +
+    coord_equal() +
+    theme_minimal() +
+    scale_fill_distiller(palette="Spectral") +
+    theme(axis.title = element_blank(),
+          axis.text = element_blank()) +
+    labs(fill="GHI", title = "Store Layout")
+  ggsave(plot=p1, filename=paste(filename,"_layout.svg",sep=""), width=5, height=5, units="in", dpi=300, device="svg")
+  
+  p2<-ggplot(density_df_avg, aes(x=x, y=y, fill=value)) +
+    geom_tile() +
+    geom_tile(data=walls_df, fill="#FFFFFF") +
+    geom_tile(data=entrance_df, fill="#FF0000") +
+    geom_tile(data=exit_df, fill="#0000FF") +
+    scale_y_continuous(breaks = seq(0, 48, 4), limits = c(0, 48.5), minor_breaks = NULL) +
+    scale_x_continuous(breaks = seq(0, 48, 4), limits = c(0, 48.5), minor_breaks = NULL) +
+    coord_equal() +
+    theme_minimal() +
+    scale_fill_viridis_c() +
+    theme(axis.title = element_blank(),
+          axis.text = element_blank()) +
+    labs(fill="Density", title = "Pedestrian Density")
+  ggsave(plot=p2, filename=paste(filename,"_density.svg",sep=""), width=5, height=5, units="in", dpi=300, device="svg")
+  
+  p3<-ggplot(loss_df_avg, aes(x=x, y=y, fill=value)) +
+    geom_tile() +
+    geom_tile(data=walls_df, fill="#FFFFFF") +
+    geom_tile(data=entrance_df, fill="#FF0000") +
+    geom_tile(data=exit_df, fill="#0000FF") +
+    scale_y_continuous(breaks = seq(0, 48, 4), limits = c(0, 48.5), minor_breaks = NULL) +
+    scale_x_continuous(breaks = seq(0, 48, 4), limits = c(0, 48.5), minor_breaks = NULL) +
+    coord_equal() +
+    theme_minimal() +
+    scale_fill_viridis_c() +
+    theme(axis.title = element_blank(),
+          axis.text = element_blank()) +
+    labs(fill="Loss", title = paste("Monetary Loss =",round(loss_avg, 2)))
+  ggsave(plot=p3, filename=paste(filename,"_loss.svg",sep=""), width=5, height=5, units="in", dpi=300, device="svg")
+  
+  plots <- list(p1, p2, p3)
+  return(plots)
+}
