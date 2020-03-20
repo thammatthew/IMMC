@@ -21,10 +21,10 @@ for(i in 1:n_reps) {
 
 #save
 output <- list(store_layout_random, results)
-saveRDS(output, "default_euc_cashier_0.75.rds")
-plot_output(output, "default_euc_cashier_0.75")
+saveRDS(output, "default_euc_cashier_0.9_static.rds")
+plot_output(output, "default_euc_cashier_0.0_static")
 
 
 
 saveRDS(store_layout,"storelayout.rds")
-plot_mat(store_layout$blocked_mat)
+plot_df(store_layout$target_df)
