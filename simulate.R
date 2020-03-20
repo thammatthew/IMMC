@@ -58,6 +58,21 @@ plot_df <- function(df) {
   return(p)
 }
 
+plot_df_ghi <- function(df) {
+  p<-ggplot(df, aes(x=x,y=y,fill=ghi)) +
+    geom_tile() +
+    scale_y_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+    scale_x_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+    coord_equal() +
+    scale_fill_viridis_c() +
+    theme_minimal() +
+    theme(axis.title = element_blank(),
+          axis.text = element_blank(),
+          legend.position = "none")
+  p<-ggplotly(p)
+  return(p)
+}
+
 make_df <- function(mat, val) {
   df <- which(mat == val, arr.ind = TRUE) %>%
     as.data.frame() %>%
@@ -320,16 +335,17 @@ plot_output <- function(output, filename) {
   store_layout <- output[[1]]
   density_mat_avg <- matrix(0, 48, 48)
   loss_mat_avg <- matrix(0,48,48)
-  loss_avg <- 0
+  loss <- c()
   for(i in 1:length(results)) {
     density_mat_avg <- density_mat_avg + results[[i]][[1]]
     loss_mat_avg <- loss_mat_avg + results[[i]][[2]]
-    loss_avg <- loss_avg + results[[i]][[3]] 
+    loss <- c(loss, results[[i]][[3]])
   }
+  loss_avg <- mean(loss)
+  loss_sd <- sd(loss)
   density_mat_avg <- density_mat_avg/length(results)
   loss_mat_avg <- loss_mat_avg/length(results)
-  loss_avg <- loss_avg/length(results)
-  
+
   density_df_avg <- make_df_full(density_mat_avg)
   loss_df_avg <- make_df_full(loss_mat_avg)
   
@@ -381,7 +397,7 @@ plot_output <- function(output, filename) {
     scale_fill_viridis_c() +
     theme(axis.title = element_blank(),
           axis.text = element_blank()) +
-    labs(fill="Loss", title = paste("Monetary Loss =",round(loss_avg, 2)))
+    labs(fill="Loss", title = paste("Mean Loss =",round(loss_avg, 2),"SD =",round(loss_sd,2)))
   ggsave(plot=p3, filename=paste(filename,"_loss.svg",sep=""), width=5, height=5, units="in", dpi=300, device="svg")
   
   plots <- list(p1, p2, p3)
