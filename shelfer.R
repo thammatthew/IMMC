@@ -60,6 +60,8 @@ select_positions_adaptive <- function(shelf_df){
 }
 
 select_positions_static<-function(shelf_df){
+  shelf_df<-shelf_df[order(shelf_df$x),]
+  shelf_df<-shelf_df[order(shelf_df$y),]
   shelf_positions = shelf_df[seq(1, nrow(shelf_df), (134)), ]
   return(shelf_positions)
 }
