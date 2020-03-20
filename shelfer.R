@@ -1,3 +1,4 @@
+source('simulate.R',local=T)
 # Get the store_layout for editing
 store_layout <- read_img_map("example.pbm")
 
@@ -46,11 +47,13 @@ order_positions_descending_y <- function(shelf_positions) {
 # An order_items function sorts store_data based on some attribute (e.g. ghi, fragility, wtvr else)
 order_items_ascending_ghi <- function(storedata) {
   storedata_sorted<-storedata[order(storedata$ghi),]
+  storedata+sorted<-storedata[order(storedata$dpmt),]
   return(storedata_sorted)
 }
 
 order_items_random <- function(storedata) {
   storedata_sorted <- storedata[sample(storedata$item_id),]
+  storedata+sorted<-storedata[order(storedata$dpmt),]
 }
 ## An example call to place_items(): 
 ## Concept is that you tell place_items() how to select shelves from the walls (select_positions()), how to order those positions according to coordinates (order_positions()), and how to insert item_ids into the sorted coordinates (order_items())
