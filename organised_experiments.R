@@ -10,6 +10,7 @@ store_layout_ascending <- place_items(store_layout, storedata, select_positions_
 results = list()
 # Run simulation for 5 reps
 for(i in 1:n_reps) {
+  print(paste("Simulating replicate",i))
   results[[i]] <- simulate(store_layout = store_layout_ascending, storedata=storedata, n_agents = n_agents, plot=FALSE, from_bitmap = FALSE)
 }
 
