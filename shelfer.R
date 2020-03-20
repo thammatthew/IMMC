@@ -58,6 +58,12 @@ select_positions_adaptive <- function(shelf_df){
   }
   return(shelf_positions)
 }
+
+select_positions_static<-function(shelf_df){
+  distance<-nrow(shelf_df)/(134^0.5)
+  shelf_positions = shelf_df[seq(1, nrow(df), distance), ]
+}
+
 # An order_position function takes in a shelf_positions df with 134 rows, and orders them somehow
 order_positions_ascending_y <- function(shelf_positions) {
   shelf_positions<-shelf_positions[order(shelf_positions$y),]
