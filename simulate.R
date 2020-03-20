@@ -58,6 +58,21 @@ plot_df <- function(df) {
   return(p)
 }
 
+plot_df_ghi <- function(df) {
+  p<-ggplot(df, aes(x=x,y=y,fill=ghi)) +
+    geom_tile() +
+    scale_y_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+    scale_x_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+    coord_equal() +
+    scale_fill_viridis_c() +
+    theme_minimal() +
+    theme(axis.title = element_blank(),
+          axis.text = element_blank(),
+          legend.position = "none")
+  p<-ggplotly(p)
+  return(p)
+}
+
 make_df <- function(mat, val) {
   df <- which(mat == val, arr.ind = TRUE) %>%
     as.data.frame() %>%
