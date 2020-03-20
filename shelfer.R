@@ -33,6 +33,25 @@ select_positions_random <- function(shelf_df) {
   return(shelf_positions)
 }
 
+select_positions_adaptive <- function(shelf_df){
+  decay<-5
+  items<-134
+  tally<-0
+  shelf_positions<-NULL
+  for (i in 1:48){
+    n<-48-i
+    s<-shelf_df[which(shelfdf$y==n),]
+    shelf_temp<-s$x%%decay==0
+    tally<-tally+nrow(shelf_temp)
+    if ((items-tally<items/10)&(decay>1)){
+      decay=decay-1
+      tally=0
+    }
+    items=items-nrow(shelf_temp)
+    shelf_positions<-cbind(shelf_positions,shelf_temp)
+  }
+  return(shelf_positions)
+}
 # An order_position function takes in a shelf_positions df with 134 rows, and orders them somehow
 order_positions_ascending_y <- function(shelf_positions) {
   shelf_positions<-shelf_positions[order(shelf_positions$y),]
