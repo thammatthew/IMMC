@@ -5,12 +5,12 @@ store_layout <- read_img_map("example.pbm")
 # Core place_items function; no need to edit this code
 place_items <- function(store_layout, storedata,select_positions, order_positions, order_items,threshold,x,y) {
   #differentiate and sort prominent and normal items
-  prominent_items<-storedata[which(storedata$ghi>=threshold)]
+  prominent_items<-storedata[which(storedata$ghi>=threshold),]
   prominent_items<-prominent_items[order(prominent_items$ghi),]
-  normal_items<-storedata[which(storedata$ghi<threshold)]
-  normal_items<-order_items(normal_items,x,y)
+  normal_items<-storedata[which(storedata$ghi<threshold),]
+  normal_items<-order_items(normal_items)
   #create the sorted layout
-  storedata_sorted<-cbind(prominent_items,normal_items)
+  storedata_sorted<-rbind(prominent_items,normal_items)
   #import layouts
   walls_mat <- store_layout$walls_mat
   blocked_mat <- store_layout$blocked_mat
@@ -22,7 +22,7 @@ place_items <- function(store_layout, storedata,select_positions, order_position
   shelf_positions <- select_positions(shelf_df)
   # Insert an item into each shelf position
   ## Sort positions by increasing y position
-  shelf_positions<-order_positions(shelf_positions)
+  shelf_positions<-order_positions(shelf_positions,x,y)
   ## Bind positions to items
   shelf_positions$value <- storedata_sorted$item_id
   shelf_positions$ghi <- storedata_sorted$ghi
@@ -71,14 +71,14 @@ order_positions_descending_y <- function(shelf_positions) {
 
 order_positions_euclidean<-function(shelf_positions,x,y){
   shelf_positions$euclidean<-(shelf_positions$x-x)^2+(shelf_positions$y-y)^2
-  shelf_positions<-shelf_positions[order(-shelf_positions$euclidean,)]
+  shelf_positions<-shelf_positions[order(-shelf_positions$euclidean),]
   shelf_positions$euclidean<-NULL
   return(shelf_positions)
 }
 # An order_items function sorts store_data based on some attribute (e.g. ghi, fragility, wtvr else)
 order_items_ascending_ghi <- function(storedata) {
   storedata_sorted<-storedata[order(storedata$ghi),]
-  storedata+sorted<-storedata[order(storedata$dpmt),]
+  storedata_sorted<-storedata[order(storedata$dpmt),]
   return(storedata_sorted)
 }
 
