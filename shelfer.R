@@ -8,7 +8,7 @@ place_items <- function(store_layout, storedata,select_positions, order_position
   prominent_items<-storedata[which(storedata$ghi>=threshold)]
   prominent_items<-prominent_items[order(prominent_items$ghi),]
   normal_items<-storedata[which(storedata$ghi<threshold)]
-  normal_items<-order_items(normal_items)
+  normal_items<-order_items(normal_items,x,y)
   #create the sorted layout
   storedata_sorted<-cbind(prominent_items,normal_items)
   #import layouts
@@ -71,7 +71,7 @@ order_positions_descending_y <- function(shelf_positions) {
 
 order_positions_euclidean<-function(shelf_positions,x,y){
   shelf_positions$euclidean<-(shelf_positions$x-x)^2+(shelf_positions$y-y)^2
-  shelf_positions<-shelf_positions[order(shelf_positions$euclidean,)]
+  shelf_positions<-shelf_positions[order(-shelf_positions$euclidean,)]
   shelf_positions$euclidean<-NULL
   return(shelf_positions)
 }
@@ -84,7 +84,7 @@ order_items_ascending_ghi <- function(storedata) {
 
 order_items_random <- function(storedata) {
   storedata_sorted <- storedata[sample(storedata$item_id),]
-  storedata+sorted<-storedata[order(storedata$dpmt),]
+  storedata_sorted<-storedata[order(storedata$dpmt),]
 }
 ## An example call to place_items(): 
 ## Concept is that you tell place_items() how to select shelves from the walls (select_positions()), how to order those positions according to coordinates (order_positions()), and how to insert item_ids into the sorted coordinates (order_items())
