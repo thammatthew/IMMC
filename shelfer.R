@@ -3,7 +3,7 @@ source('simulate.R',local=T)
 store_layout <- read_img_map("example.pbm")
 
 # Core place_items function; no need to edit this code
-place_items <- function(store_layout, storedata,select_positions, order_positions, order_items,threshold) {
+place_items <- function(store_layout, storedata,select_positions, order_positions, order_items,threshold,x,y) {
   #differentiate and sort prominent and normal items
   prominent_items<-storedata[which(storedata$ghi>=threshold)]
   prominent_items<-prominent_items[order(prominent_items$ghi),]
