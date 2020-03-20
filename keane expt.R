@@ -5,11 +5,11 @@ n_reps = 10
 n_agents = 100
 
 # Pull a store_layout from an image
-store_layout <- read_img_map("store_layout/bitmap/original_layout_blocked.pbm")
+store_layout <- read_img_map("store_layout/ideas/min_1.pbm")
 
 # Baseline: completely randomised arrangement of items
 # Place items into the layout
-store_layout_random <- place_items(store_layout, storedata, select_positions_static, order_positions_euclidean, order_items_ascending_ghi,threshold=0.9,x=23,y=38)
+store_layout_random <- place_items(store_layout, storedata, select_positions_random, order_positions_euclidean, order_items_ascending_ghi,threshold=0.9,x=4,y=35)
 
 # Create a blank list to store results
 results = list()
