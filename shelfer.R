@@ -63,6 +63,12 @@ order_positions_descending_y <- function(shelf_positions) {
   return(shelf_positions)
 }
 
+order_positions_euclidean<-function(shelf_positions,x,y){
+  shelf_positions$euclidean<-(shelf_positions$x-x)^2+(shelf_positions$y-y)^2
+  shelf_positions<-shelf_positions[order(shelf_positions$euclidean,)]
+  shelf_positions$euclidean<-NULL
+  return(shelf_positions)
+}
 # An order_items function sorts store_data based on some attribute (e.g. ghi, fragility, wtvr else)
 order_items_ascending_ghi <- function(storedata) {
   storedata_sorted<-storedata[order(storedata$ghi),]
