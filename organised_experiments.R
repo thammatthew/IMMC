@@ -15,4 +15,3 @@ for(i in 1:n_reps) {
 
 output <- list(store_layout_ascending, results)
 saveRDS(output, "derek_layout_3_ascending.rds")
-plot_output(output, "derek_layout_3_ascending")
