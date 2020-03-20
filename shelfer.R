@@ -3,7 +3,15 @@ source('simulate.R',local=T)
 store_layout <- read_img_map("example.pbm")
 
 # Core place_items function; no need to edit this code
-place_items <- function(store_layout, storedata, select_positions, order_positions, order_items) {
+place_items <- function(store_layout, storedata,select_positions, order_positions, order_items,threshold) {
+  #differentiate and sort prominent and normal items
+  prominent_items<-storedata[which(storedata$ghi>=threshold)]
+  prominent_items<-prominent_items[order(prominent_items$ghi),]
+  normal_items<-storedata[which(storedata$ghi<threshold)]
+  normal_items<-order_items(normal_items)
+  #create the sorted layout
+  storedata_sorted<-cbind(prominent_items,normal_items)
+  #import layouts
   walls_mat <- store_layout$walls_mat
   blocked_mat <- store_layout$blocked_mat
   shelf_mat <- walls_mat-blocked_mat
@@ -15,8 +23,6 @@ place_items <- function(store_layout, storedata, select_positions, order_positio
   # Insert an item into each shelf position
   ## Sort positions by increasing y position
   shelf_positions<-order_positions(shelf_positions)
-  ## Sort items by increasing GHI
-  storedata_sorted<-order_items(storedata)
   ## Bind positions to items
   shelf_positions$value <- storedata_sorted$item_id
   shelf_positions$ghi <- storedata_sorted$ghi
