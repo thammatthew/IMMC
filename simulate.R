@@ -182,7 +182,7 @@ create_agent_list <- function(store_layout, n_agents) {
   return(agent_list)
 }
 
-simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, name="density_plot", img_w=48, img_h=48) {
+simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, pixmap=FALSE, name="plot", img_w=48, img_h=48) {
   density_mat = matrix(0, img_w, img_h)
   walls_mat = store_layout[["walls_mat"]]
   cashier_in_mat = store_layout[["cashier_in_mat"]]
@@ -203,25 +203,46 @@ simulate_density <- function(store_layout, agent_list, coeff=0.1, plot=FALSE, na
       if (is.null(current_path)) {
         current_path <- mg$run(target, source)
       }
+      path_mat = matrix(0, img_w, img_h)
       for(k in current_path) {
         density_mat[k[1], k[2]] <- density_mat[k[1], k[2]] + 1
+        path_mat[k[1], k[2]] <- path_mat[k[1], k[2]] + 1
       }
-      if(plot==TRUE) {
-        file_name = paste(name,"_", i, "_", j, ".png", sep="")
-        density_df = make_df_full(density_mat)
-        walls_df = make_df(walls_mat, 1)
-        p <- ggplot(density_df, aes(x=x,y=y,fill=value)) +
-          geom_tile() +
-          geom_tile(data=walls_df, fill="#FFFFFF") +
-          scale_y_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
-          scale_x_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
-          coord_equal() +
-          scale_fill_viridis_c() +
-          theme_minimal() +
-          theme(axis.title = element_blank(),
-                axis.text = element_blank(),
-                legend.position = "none")
-        ggsave(plot=p, filename=file_name, width=1, height=1, units="in", dpi=150, device="png")
+      if(plot==FALSE) {
+      } else {
+        if(pixmap==FALSE) {
+          file_name = paste(name,"_", i, "_", j, ".png", sep="")
+          density_df = make_df_full(density_mat)
+          walls_df = make_df(walls_mat, 1)
+          p <- ggplot(density_df, aes(x=x,y=y,fill=value)) +
+            geom_tile() +
+            geom_tile(data=walls_df, fill="#FFFFFF") +
+            scale_y_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+            scale_x_continuous(breaks = seq(0, 48, 1), limits = c(0, 48.5), minor_breaks = NULL) +
+            coord_equal() +
+            scale_fill_viridis_c() +
+            theme_minimal() +
+            theme(axis.title = element_blank(),
+                  axis.text = element_blank(),
+                  legend.position = "none")
+          ggsave(plot=p, filename=file_name, width=1, height=1, units="in", dpi=150, device="png")
+        }else{
+          density_file_name = paste("density","_",name,"_",i,"_",j,".pbm", sep="")
+          density_img = pixmapGrey(density_mat)
+          write.pnm(density_img, file=density_file_name)
+
+          path_file_name = paste("path","_",name,"_",i,"_",j,".pbm", sep="")
+          path_img = pixmapGrey(path_mat)
+          write.pnm(path_img, file=path_file_name)
+        }
+      }
+        
+        
+        if(plot==TRUE & pixmap==FALSE) {
+        
+        
+      } else if(plot==TRUE & pixmap==TRUE) {
+        
       }
     }
     print(paste("Agent",i,"simulated..."))
@@ -298,7 +319,7 @@ get_loss_mat <- function(storedata, density_mat, target_df, n_agents) {
   return(loss_mat)
 }
 
-simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, loss_fn=get_loss, max_routes=3, coeff=0.1, reps=5, plot=FALSE, name="density_plot", from_bitmap=TRUE) {
+simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, loss_fn=get_loss, max_routes=3, coeff=0.1, reps=5, plot=FALSE, pixmap=FALSE, name="plot", from_bitmap=TRUE) {
   # This value is technically not necessarily the same for all agents, but we're assuming it is
   print("Reading store layout from bitmap...")
   if(from_bitmap == TRUE) {
@@ -313,7 +334,7 @@ simulate <- function(pbm_path, store_layout = NULL, storedata, n_agents=100, los
   print("Randomly generating agents...")
   agent_list <- create_agent_list(store_layout, n_agents)
   print("Running density simulation...")
-  density_mat <- simulate_density(store_layout, agent_list, coeff, plot, name, img_w, img_h)
+  density_mat <- simulate_density(store_layout, agent_list, coeff, plot, pixmap, name, img_w, img_h)
   print("Density simulation complete.")
   
   print("Computing estimated loss...")
@@ -403,3 +424,11 @@ plot_output <- function(output, filename) {
   plots <- list(p1, p2, p3)
   return(plots)
 }
+
+save_mat <- function(mat, name) {
+  file_name = paste(name,".pbm", sep="")
+  img = pixmapGrey(mat)
+  write.pnm(img, file=file_name)
+}
+
+
